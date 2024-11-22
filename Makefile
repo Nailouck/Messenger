@@ -1,4 +1,4 @@
-.PHONY: server.o client.o uninstall run
+.PHONY: server.o client.o uninstall
 all:
 
 server.o: server.c err_proc.c
@@ -8,7 +8,3 @@ client.o: client.c
 uninstall:
 	rm server.o
 	rm client.o
-runserv:
-	./server.o
-runcli:
-	./client.o
