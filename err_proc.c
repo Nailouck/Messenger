@@ -43,3 +43,12 @@ void Connect(int sockfd, struct sockaddr* addr, socklen_t addrlen) {
         exit(EXIT_FAILURE);
     }
 }
+ssize_t Read(int sockfd, char* buffer, int buflen) {
+    ssize_t res = read(sockfd, buffer, buflen);
+    if (res == -1) {
+        perror("Reading error!");
+        exit(EXIT_FAILURE);
+    }
+    if (res == 0) { puts("Ñlient has disconnected.\n"); }
+    return res;
+}
