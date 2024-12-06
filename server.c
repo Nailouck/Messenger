@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 #include "err_proc.h"
+#include "message.h"
+
+extern const int BUFF_SIZE;
 
 int main(int argc, char *argv[]) {
 
@@ -28,29 +28,14 @@ int main(int argc, char *argv[]) {
     socklen_t adrlen = sizeof addr;
     int client_socket = Accept(server_socket, (struct sockaddr*) &addr, &adrlen);
 
-    ssize_t nread;
-    char buff[512];
-    int disconnect = 0;
+    char buff[BUFF_SIZE];
+    struct message msg;
+    msg.buff = buff;
+    msg.socket = client_socket;
     do {
-        if (disconnect == 3) { break; }
-        bzero(buff, 512);
-        nread = read(client_socket, buff, 512);
-        if (nread == -1) {
-            perror("Reading error!");
-            exit(EXIT_FAILURE);
-        }
-        if (nread == 0) {
-            printf("Ñlient has disconnected.\n");
-            disconnect++;
-        }
-
-        write(STDOUT_FILENO, buff, nread);
-        bzero(buff, 512);
-        fgets(buff, 512, stdin);
-        buff[strlen(buff) - 1] = '\n';
-        buff[strlen(buff)] = '\0';
-        write(client_socket, buff, strlen(buff) * sizeof(char));
-    } while (buff[0] + buff[1] + buff[2] != 'E' + '\n' + '\0');
+        read_msg(msg);
+        write_msg(msg);
+    } while (strcmp(msg.buff, "E\n\0") != 0);
     
 
     sleep(1);
