@@ -11,11 +11,12 @@ extern const int BUFF_SIZE;
 int main(int argc, char *argv[]) {
 
 	if (argc < 2) {
-		puts("Not enough program arguments! Example: ./object <port>\n");
+		puts("Not enough program arguments! Example: ./client.o <port>\n");
 		return -1;
 	}
 
 	int client_socket = Socket(AF_INET, SOCK_STREAM, 0);
+
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(atoi(argv[1]));

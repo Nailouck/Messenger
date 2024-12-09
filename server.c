@@ -11,7 +11,7 @@ extern const int BUFF_SIZE;
 int main(int argc, char *argv[]) {
 
     if (argc < 2) {
-        puts("Not enough program arguments! Example: ./object <port>\n");
+        puts("Not enough program arguments! Example: ./server.o <port>\n");
         return -1;
     }
 
@@ -23,8 +23,8 @@ int main(int argc, char *argv[]) {
     addr.sin_addr.s_addr = INADDR_ANY;
 
     Bind(server_socket, (struct sockaddr*) &addr, sizeof(addr));
+    Listen(server_socket, 1);
 
-    Listen(server_socket, 5);
     socklen_t adrlen = sizeof addr;
     int client_socket = Accept(server_socket, (struct sockaddr*) &addr, &adrlen);
 
@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
     struct message msg;
     msg.buff = buff;
     msg.socket = client_socket;
+
     do {
         read_msg(msg);
         write_msg(msg);
