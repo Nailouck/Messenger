@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 
 	do {
 		write_msg(msg);
-		if (strcmp(msg.buff, "E\n\0") == 0) { break; }
+		if (strcmp(msg.buff, "E\0") == 0) { break; }
 		read_msg(msg);
 	}
 	while (1);

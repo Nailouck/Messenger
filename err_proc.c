@@ -13,6 +13,7 @@ int Socket(int domain, int type, int protocol) {
     }
     return res;
 }
+
 void Bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) {
     int res = bind(sockfd, addr, addrlen);
     if (res == -1) {
@@ -20,6 +21,7 @@ void Bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) {
         exit(EXIT_FAILURE);
     }
 }
+
 int Listen(int sockfd, int backlog) {
     int res = listen(sockfd, backlog);
     if (res == -1) {
@@ -28,6 +30,7 @@ int Listen(int sockfd, int backlog) {
     }
     return res;
 }
+
 int Accept(int sockfd, struct sockaddr* addr, socklen_t *addrlen) {
     int res = accept(sockfd, addr, addrlen);
     if (res == -1) {
@@ -36,6 +39,7 @@ int Accept(int sockfd, struct sockaddr* addr, socklen_t *addrlen) {
     }
     return res;
 }
+
 void Connect(int sockfd, struct sockaddr* addr, socklen_t addrlen) {
     int res = connect(sockfd, addr, addrlen);
     if (res == -1) {
@@ -43,6 +47,7 @@ void Connect(int sockfd, struct sockaddr* addr, socklen_t addrlen) {
         exit(EXIT_FAILURE);
     }
 }
+
 ssize_t Read(int sockfd, char* buffer, int buflen) {
     ssize_t res = read(sockfd, buffer, buflen);
     if (res == -1) {

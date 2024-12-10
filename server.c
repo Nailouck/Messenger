@@ -36,10 +36,9 @@ int main(int argc, char *argv[]) {
     do {
         read_msg(msg);
         write_msg(msg);
-    } while (strcmp(msg.buff, "E\n\0") != 0);
+    } while (strcmp(msg.buff, "E\0") != 0);
     
 
-    sleep(1);
     close(client_socket);
     close(server_socket);
     return 0;
