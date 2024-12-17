@@ -8,25 +8,28 @@
 
 extern const int BUFF_SIZE;
 
+typedef struct sockaddr sockaddr_t;
+
 int main(int argc, char *argv[]) {
 
-    if (argc < 2) {
-        puts("Not enough program arguments! Example: ./server.o <port>\n");
-        return -1;
+    if (strcmp(find_p(argv, argc), "Error\0") == 0) {
+        argc += 2;
+        argv[argc - 2] = "-p\0";
+        argv[argc - 1] = "9898\0";
     }
 
-    int server_socket = Socket(AF_INET, SOCK_STREAM, 0);
+    int server_socket = socket_wrap(AF_INET, SOCK_STREAM, 0);
 
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(atoi(argv[1]));
+    addr.sin_port = htons(atoi(find_p(argv, argc)));
     addr.sin_addr.s_addr = INADDR_ANY;
 
-    Bind(server_socket, (struct sockaddr*) &addr, sizeof(addr));
-    Listen(server_socket, 1);
+    bind_wrap(server_socket, (sockaddr_t*)&addr, sizeof(addr));
+    listen_wrap(server_socket, 1);
 
     socklen_t adrlen = sizeof addr;
-    int client_socket = Accept(server_socket, (struct sockaddr*) &addr, &adrlen);
+    int client_socket = accept_wrap(server_socket, (sockaddr_t*) &addr, &adrlen);
 
     char buff[BUFF_SIZE];
     struct message msg;
