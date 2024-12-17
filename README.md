@@ -16,40 +16,41 @@
 
 ### Код:
 ```
-extern const int BUFF_SIZE;
+typedef struct sockaddr sockaddr_t;
 ```
-Дикларируем константу BUFF_SIZE, которая инициализирована в messange.c и означает размер буфера.
+Объявляем тип данных sockaddr_t.
 
 ```
-if (argc < 2) {
-    puts("Not enough program arguments! Example: ./server.o <port>\n");
-    return -1;
+if (strcmp(find_p(argv, argc), "Error\0") == 0) {
+    argc += 2;
+    argv[argc - 2] = "-p\0";
+    argv[argc - 1] = "9898\0";
 }
 ```
-Проверяем, ввёл ли пользователь порт для подключения, если нет, завершаем программу с кодом -1 - недостаточное количество входных данных.
+Проверяем, ввёл ли пользователь порт для подключения, если нет, используем порт по умолчанию. Функция find_p объявлена в файле err_proc.h.
 
 ```
-int server_socket = Socket(AF_INET, SOCK_STREAM, 0);
+int server_socket = socket_wrap(AF_INET, SOCK_STREAM, 0);
 ```
 Создаём сокет, используя обёрточную функцию из файла err_proc.h, передаём на вход AF_INET - семейство протоколов, SOCK_STREAM - тип сокета (в нашем случае потоковый) и протокол (при передаче нуля, используется значение по умолчанию)
 
 ```
 struct sockaddr_in addr;
 addr.sin_family = AF_INET;
-addr.sin_port = htons(atoi(argv[1]));
+addr.sin_port = htons(atoi(find_p(argv, argc)));
 addr.sin_addr.s_addr = INADDR_ANY;
 ```
-Инициализируем структуру addr, которая хранит sin_family = AF_INET - семейство протоколов, sin_port - порт для подключения, который вводится пользователем при запуске программы и конвертируется сначала в число с помощью функции atoi, потом - в IP адрес с помощью функции htons. В addr.sin_addr.s_addr хранится адрес связывания (в нашем случае это INADDR_ANY, что означает, что нам подойдёт любой свободный адрес)
+Инициализируем структуру addr, которая хранит sin_family = AF_INET - семейство протоколов, sin_port - порт для подключения, который вводится пользователем при запуске программы и конвертируется сначала в число с помощью функции atoi, потом - в little endian с помощью функции htons. В addr.sin_addr.s_addr хранится адрес связывания (в нашем случае это INADDR_ANY, что означает, что нам подойдёт любой свободный адрес)
 
 ```
-Bind(server_socket, (struct sockaddr*) &addr, sizeof(addr));
-Listen(server_socket, 1);
+bind_wrap(server_socket, (sockaddr_t*) &addr, sizeof(addr));
+listen_wrap(server_socket, 1);
 ```
 Связываем сокет с конкретным адресом, т. е. с нашей структурой sockaddr_in addr, после чего ставим его "в режим прослушивания" в ожидании одного подключения.
 
 ```
 socklen_t adrlen = sizeof addr;
-int client_socket = Accept(server_socket, (struct sockaddr*) &addr, &adrlen);
+int client_socket = accept_wrap(server_socket, (sockaddr_t*) &addr, &adrlen);
 ```
 Принимаем и инициализируем клиентский сокет.
 
@@ -90,33 +91,34 @@ return 0;
 
 ### Код:
 ```
-extern const int BUFF_SIZE;
+typedef struct sockaddr sockaddr_t;
 ```
-Дикларируем константу BUFF_SIZE, которая инициализирована в messange.c и означает размер буфера.
+Объявляем тип данных sockaddr_t.
 
 ```
-if (argc < 2) {
-    puts("Not enough program arguments! Example: ./server.o <port>\n");
-    return -1;
+if (strcmp(find_p(argv, argc), "Error\0") == 0) {
+    argc += 2;
+    argv[argc - 2] = "-p\0";
+    argv[argc - 1] = "9898\0";
 }
 ```
-Проверяем, ввёл ли пользователь порт для подключения, если нет, завершаем программу с кодом -1 - недостаточное количество входных данных.
+Проверяем, ввёл ли пользователь порт для подключения, если нет, используем порт по умолчанию. Функция find_p объявлена в файле err_proc.h.
 
 ```
-int client_socket = Socket(AF_INET, SOCK_STREAM, 0);
+int client_socket = socket_wrap(AF_INET, SOCK_STREAM, 0);
 ```
 Создаём сокет, используя обёрточную функцию из файла err_proc.h, передаём на вход AF_INET - семейство протоколов, SOCK_STREAM - тип сокета (в нашем случае потоковый) и протокол (при передаче нуля, используется значение по умолчанию)
 
 ```
 struct sockaddr_in addr;
 addr.sin_family = AF_INET;
-addr.sin_port = htons(atoi(argv[1]));
+addr.sin_port = htons(atoi(find_p(argv, argc)));
 addr.sin_addr.s_addr = INADDR_ANY;
 ```
-Инициализируем структуру addr, которая хранит sin_family = AF_INET - семейство протоколов, sin_port - порт для подключения, который вводится пользователем при запуске программы и конвертируется сначала в число с помощью функции atoi, потом - в IP адрес с помощью функции htons. В addr.sin_addr.s_addr хранится адрес связывания (в нашем случае это INADDR_ANY, что означает, что нам подойдёт любой свободный адрес)
+Инициализируем структуру addr, которая хранит sin_family = AF_INET - семейство протоколов, sin_port - порт для подключения, который вводится пользователем при запуске программы и конвертируется сначала в число с помощью функции atoi, потом - в little endian с помощью функции htons. В addr.sin_addr.s_addr хранится адрес связывания (в нашем случае это INADDR_ANY, что означает, что нам подойдёт любой свободный адрес)
 
 ```
-Connect(client_socket, (struct sockaddr*)&addr, sizeof(addr));
+connect_wrap(client_socket, (sockaddr_t*)&addr, sizeof(addr));
 ```
 Посылаем запрос на присоединение к серверу.
 
@@ -154,6 +156,11 @@ return 0;
 Нужно для того, чтобы при запуске программы заголовочный файл открывался только единожды.
 
 ```
+const int BUFF_SIZE = 512;
+```
+Инициализация константы, обозначающей размер буфера.
+
+```
 struct message {
     int socket;
     char* buff;
@@ -177,15 +184,11 @@ void write_msg(struct message msg);
 "err_proc.h" для использования обёрточных функций обработки ошибок.
 
 ### Код
-```
-const int BUFF_SIZE = 512;
-```
-Инициализация константы, обозначающей размер буфера.
 
 ```
 void read_msg(struct message msg) {
     bzero(msg.buff, BUFF_SIZE);
-    Read(msg.socket, msg.buff, BUFF_SIZE);
+    read_wrap(msg.socket, msg.buff, BUFF_SIZE);
     puts(msg.buff);
     if (strcmp(msg.buff, "E\0") == 0) {
         puts("Сlient has disconnected.\n");
@@ -219,12 +222,14 @@ void write_msg(struct message msg) {
 Нужно для того, чтобы при запуске программы заголовочный файл открывался только единожды.
 
 ```
-int Socket(int domain, int type, int protocol);
-void Bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen);
-int Listen(int sockfd, int backlog);
-int Accept(int sockfd, struct sockaddr* addr, socklen_t *addrlen);
-void Connect(int sockfd, struct sockaddr* addr, socklen_t addrlen);
-ssize_t Read(int sockfd, char* buffer, int buflen)
+int socket_wrap(int domain, int type, int protocol);
+void bind_wrap(int sockfd, const struct sockaddr* addr, socklen_t addrlen);
+int listen_wrap(int sockfd, int backlog);
+int accept_wrap(int sockfd, struct sockaddr* addr, socklen_t *addrlen);
+void connect_wrap(int sockfd, struct sockaddr* addr, socklen_t addrlen);
+ssize_t read_wrap(int sockfd, char* buffer, int buflen);
+
+char* find_p(char** arg_values, int arg_count);
 ```
 Декларация функций, реализация которых прописана в err_proc.c.
 
@@ -234,6 +239,7 @@ ssize_t Read(int sockfd, char* buffer, int buflen)
 ### Подключаемые библиотеки и заголовочные файлы:
 <stdlib.h>
 <stdio.h>
+<string.h>
 <sys/types.h>
 <sys/socket.h>
 <unistd.h>
@@ -241,7 +247,7 @@ ssize_t Read(int sockfd, char* buffer, int buflen)
 
 ### Код
 ```
-int Socket(int domain, int type, int protocol) {
+int socket_wrap(int domain, int type, int protocol) {
     int res = socket(domain, type, protocol);
     if (res == -1) {
         perror("Opening socket error!");
@@ -253,7 +259,7 @@ int Socket(int domain, int type, int protocol) {
 Обёрточная функция для обработки ошибки при создании сокета.
 
 ```
-void Bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) {
+void bind_wrap(int sockfd, const struct sockaddr* addr, socklen_t addrlen) {
     int res = bind(sockfd, addr, addrlen);
     if (res == -1) {
         perror("Binding error!");
@@ -264,7 +270,7 @@ void Bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) {
 Обёрточная функция для обработки ошибки при привязывании сокета к адресу.
 
 ```
-int Listen(int sockfd, int backlog) {
+int listen_wrap(int sockfd, int backlog) {
     int res = listen(sockfd, backlog);
     if (res == -1) {
         perror("Listening error!");
@@ -276,7 +282,7 @@ int Listen(int sockfd, int backlog) {
 Обёрточная функция для обработки ошибки при прослушивании сокетом.
 
 ```
-int Accept(int sockfd, struct sockaddr* addr, socklen_t *addrlen) {
+int accept_wrap(int sockfd, struct sockaddr* addr, socklen_t *addrlen) {
     int res = accept(sockfd, addr, addrlen);
     if (res == -1) {
         perror("Accepting error!");
@@ -288,18 +294,19 @@ int Accept(int sockfd, struct sockaddr* addr, socklen_t *addrlen) {
 Обёрточная функция для обработки ошибки при принятии подключаемого сокета.
 
 ```
-void Connect(int sockfd, struct sockaddr* addr, socklen_t addrlen) {
+void connect_wrap(int sockfd, struct sockaddr* addr, socklen_t addrlen) {
     int res = connect(sockfd, addr, addrlen);
     if (res == -1) {
         perror("Connection error!");
         exit(EXIT_FAILURE);
     }
+    puts("Connection is successful!\n");
 }
 ```
 Обёрточная функция для обработки ошибки при подключении к серверу.
 
 ```
-ssize_t Read(int sockfd, char* buffer, int buflen) {
+ssize_t read_wrap(int sockfd, char* buffer, int buflen) {
     ssize_t res = read(sockfd, buffer, buflen);
     if (res == -1) {
         perror("Reading error!");
@@ -310,3 +317,15 @@ ssize_t Read(int sockfd, char* buffer, int buflen) {
 }
 ```
 Обёрточная функция для обработки ошибки при прочтении сообщения.
+
+```
+char* find_p(char** arg_values, int arg_count) {
+    for (int i = 0; i < arg_count; i++) {
+        if (strcmp(arg_values[i], "-p") == 0) {
+            return arg_values[i + 1];
+        }
+    }
+    return "Error\0";
+}
+```
+Функция поиска порта среди аргументов main.
