@@ -1,4 +1,5 @@
 #pragma once
+
 struct message {
     int socket;
     char* buff;
