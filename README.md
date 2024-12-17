@@ -321,7 +321,7 @@ ssize_t read_wrap(int sockfd, char* buffer, int buflen) {
 ```
 char* find_p(char** arg_values, int arg_count) {
     for (int i = 0; i < arg_count; i++) {
-        if (strcmp(arg_values[i], "-p") == 0) {
+        if (strcmp(arg_values[i], "-p") == 0 || strcmp(arg_values[i], "--port") == 0) {
             return arg_values[i + 1];
         }
     }
