@@ -1,10 +1,9 @@
-.PHONY: server.o client.o uninstall
+.PHONY: server client uninstall
 all:
 
-server.o: server.c err_proc.c
-	gcc -o server.o server.c err_proc.c message.c
-client.o: client.c
-	gcc -o client.o client.c err_proc.c message.c
+server: server.c err_proc.c message.c
+	gcc -o server server.c err_proc.c message.c
+client: client.c err_proc.c message.c
+	gcc -o client client.c err_proc.c message.c
 uninstall:
-	rm server.o
-	rm client.o
+	rm server client
